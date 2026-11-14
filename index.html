@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#172b4d">
+<title>ドキドキ！ミステリー抽選</title>
+<style>
+:root{--navy:#172b4d;--blue:#294d78;--gold:#ffd166;--cream:#fff8e8;--pink:#ff8fab;--mint:#8ce0c1}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;color:#fff;background:radial-gradient(circle at 50% 0,#416a91 0,#203d63 42%,#12243f 100%);overflow-x:hidden}
+button{font:inherit;cursor:pointer;border:0}.app{max-width:720px;margin:auto;padding:18px 16px 40px;min-height:100vh}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:900;letter-spacing:.06em;font-size:clamp(19px,5vw,28px);text-shadow:0 3px 0 #10213a}.coins{background:#10243f;border:1px solid #ffffff30;border-radius:999px;padding:9px 14px;font-weight:800;color:var(--gold);white-space:nowrap}
+.hero{text-align:center;padding:26px 0 10px}.eyebrow{color:#c7e5ff;font-size:12px;letter-spacing:.2em;font-weight:800}.hero h1{font-size:clamp(30px,8vw,48px);line-height:1.2;margin:8px 0;color:#fff;text-shadow:0 4px 0 #10213a}.hero p{color:#d9e8f6;margin:8px 0}
+.mascot{font-size:76px;filter:drop-shadow(0 8px 0 #10213a55);margin:5px 0 12px;animation:bob 2.4s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px) rotate(3deg)}}
+.panel{background:#ffffff12;border:1px solid #ffffff2b;border-radius:24px;padding:18px;box-shadow:0 14px 35px #08172b55;backdrop-filter:blur(8px)}
+.stage{min-height:240px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:12px;position:relative;overflow:hidden}
+.stage:before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;border:2px dashed #ffffff35;animation:spin 24s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.stage>*{position:relative}.prize-icon{font-size:62px;line-height:1.2}.prize-name{font-size:clamp(22px,6vw,30px);font-weight:900}.sub{color:#d7e6f5;font-size:14px}
+.primary{width:100%;border-radius:18px;padding:17px 20px;font-size:21px;font-weight:950;color:#49320a;background:linear-gradient(180deg,#ffe59a,#ffbf43);box-shadow:0 6px 0 #b87819,0 12px 25px #08172b55;transition:transform .12s,filter .12s}.primary:active{transform:translateY(4px);box-shadow:0 2px 0 #b87819}.primary:disabled{opacity:.6;cursor:default}
+.secondary{background:#ffffff18;color:#fff;border:1px solid #ffffff38;border-radius:14px;padding:11px 15px;font-weight:800}
+.actions{display:grid;gap:12px;margin-top:16px}.hint{text-align:center;color:#c6d8e9;font-size:12px;margin:14px 0 0}
+.hidden{display:none!important}.result{background:linear-gradient(145deg,#fff2c9,#ffd36d);color:#583a12;border-radius:22px;padding:22px;text-align:center;box-shadow:0 8px 0 #b87819}.result .big{font-size:48px}.result h2{font-size:clamp(28px,7vw,40px);margin:5px 0}.result p{margin:7px 0;color:#76501a}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}.stat{background:#ffffff12;border:1px solid #ffffff25;border-radius:18px;padding:14px}.stat small{color:#c7d9eb}.stat strong{display:block;font-size:24px;color:var(--gold);margin-top:4px}
+.birds{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}.bird{background:#ffffff12;border:1px solid #ffffff25;border-radius:14px;text-align:center;padding:10px 4px}.bird .emoji{font-size:30px}.bird small{display:block;font-size:10px;color:#d8e7f4;margin-top:4px}
+.notice{font-size:13px;line-height:1.7;color:#d9e8f6}.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:#fff;color:#20344f;padding:12px 18px;border-radius:999px;font-weight:800;transition:.25s;z-index:10;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}.confetti i{position:absolute;top:-20px;width:9px;height:15px;border-radius:3px;animation:fall 1.8s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.2}}
+footer{text-align:center;color:#a9c0d8;font-size:11px;margin-top:28px}
+@media(min-width:600px){.app{padding-top:26px}.actions{grid-template-columns:1fr 1fr}.actions .primary{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="top"><div class="brand">✨ MYSTERY DRAW</div><div class="coins">🪙 <span id="coinCount">0</span> コイン</div></header>
+<section class="hero"><div class="eyebrow">TODAY'S LUCKY CHALLENGE</div><h1>ドキドキ！<br>ミステリー抽選</h1><div class="mascot" aria-hidden="true">🦉</div><p>さあ、今日は何が出るかな？</p></section>
+<section id="home" class="panel">
+ <div class="stage"><div class="prize-icon" id="rouletteIcon">🎁</div><div class="prize-name" id="rouletteName">ミステリー抽選</div><div class="sub" id="rouletteSub">ボタンを押して運命のルーレットを回そう！</div></div>
+ <div class="actions"><button class="primary" id="spinBtn">🎰 抽選スタート！</button></div>
+ <p class="hint">何度でもチャレンジできるよ！</p>
+</section>
+<section id="reveal" class="hidden">
+ <div class="result"><div class="big">🎉 ✨ 🎉</div><div class="eyebrow" style="color:#94651e">TODAY'S RESULT</div><h2>お勉強タイム！</h2><p>今日のミッションが決まったよ！</p><div class="big">✏️ 📖 🐦</div></div>
+ <div class="panel" style="margin-top:14px;text-align:center"><div class="eyebrow">YOUR MISSION</div><h2 style="font-size:28px;margin:8px 0">算数ドリルに挑戦！</h2><p class="notice">いつもの算数ドリルを用意しよう。紙のドリルを自分のペースで進めてね。</p><div style="font-size:46px;color:var(--gold);font-weight:950;margin:10px" id="duration">10分</div><div class="sub">今日の目安タイム</div><button class="primary" id="startStudy" style="margin-top:18px">📚 お勉強スタート！</button></div>
+</section>
+<section id="study" class="hidden panel" style="margin-top:14px;text-align:center"><div class="mascot">🐦</div><div class="eyebrow">STUDY TIME</div><h2 style="font-size:30px;margin:8px">がんばってるね！</h2><p class="notice">算数ドリルに取り組もう。終わったら下のボタンを押してね。</p><div class="stat" style="margin:16px auto;max-width:220px"><small>今日の目安</small><strong id="studyDuration">10分</strong></div><button class="primary" id="completeBtn">✅ ドリルできた！</button><p class="hint">時間は目安だよ。ドリルが終わったら完了してね。</p></section>
+<section id="reward" class="hidden panel" style="margin-top:14px;text-align:center"><div class="big" style="font-size:60px">🎊</div><div class="eyebrow">MISSION COMPLETE</div><h2 style="font-size:30px">ミッションクリア！</h2><p class="notice">算数ドリル、おつかれさま！今回の報酬をゲット！</p><div class="result" style="margin:14px 0"><div class="big" id="rewardIcon">🪙</div><h2 id="rewardTitle">20コイン獲得！</h2><p id="rewardDesc">コツコツがんばったね！</p></div><button class="primary" id="againBtn">🏠 ホームに戻る</button></section>
+<section class="grid" aria-label="記録"><div class="stat"><small>クリアした回数</small><strong id="clearCount">0回</strong></div><div class="stat"><small>集めた鳥</small><strong id="birdCount">0羽</strong></div></section>
+<section class="panel" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">🐤 鳥図鑑</h3><span class="sub" id="collectionCount">0 / 8</span></div><div class="birds" id="birdGrid"></div><p class="hint">ドリルをクリアして、鳥たちを集めよう！</p></section>
+<footer>ミステリー抽選 • がんばりを楽しみに変えよう！</footer>
+</main>
+<div class="toast" id="toast"></div><div class="confetti" id="confetti"></div>
+<script>
+const prizes=[["🎮","Switchタイム"],["🐦","鳥探し"],["🍬","お菓子チャンス"],["📚","漢字チャレンジ"],["🎁","宝箱"],["⭐","大当たり"],["🍀","ラッキー賞"],["🗺️","冒険タイム"],["👑","スペシャル賞"],["🌈","自由時間"],["💎","レアチャンス"],["❓","ミステリー賞"]];
+const birdTypes=[["🐦","スズメ"],["🐤","シジュウカラ"],["🦜","インコ"],["🦉","フクロウ"],["🐧","ペンギン"],["🦆","カモ"],["🦚","クジャク"],["🦅","ワシ"]];
+const defaults={coins:0,clears:0,birds:[],eggProgress:0};
+let data={...defaults,...JSON.parse(localStorage.getItem("mysteryDrawData")||"{}")};
+let currentDuration=10,spinTimer=null;
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem("mysteryDrawData",JSON.stringify(data));renderStats()}
+function renderStats(){$("coinCount").textContent=data.coins;$("clearCount").textContent=data.clears+"回";$("birdCount").textContent=data.birds.length+"羽";$("collectionCount").textContent=data.birds.length+" / "+birdTypes.length;$("birdGrid").innerHTML=birdTypes.map((b,i)=>'<div class="bird"><div class="emoji">'+(data.birds.includes(i)?b[0]:"❔")+'</div><small>'+(data.birds.includes(i)?b[1]:"？？？")+'</small></div>').join("")}
+function show(id){["home","reveal","study","reward"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2200)}
+function confetti(){const c=$("confetti");c.innerHTML="";for(let i=0;i<55;i++){const e=document.createElement("i");e.style.left=Math.random()*100+"%";e.style.background=["#ffd166","#ff8fab","#8ce0c1","#9bd0ff","#fff"][i%5];e.style.animationDelay=Math.random()*.6+"s";c.appendChild(e)}setTimeout(()=>c.innerHTML="",2600)}
+function startSpin(){const btn=$("spinBtn");btn.disabled=true;let elapsed=0,duration=3300;const start=performance.now();function tick(now){elapsed=now-start;const p=Math.min(elapsed/duration,1);const idx=Math.floor(Math.random()*prizes.length);$("rouletteIcon").textContent=prizes[idx][0];$("rouletteName").textContent=prizes[idx][1];$("rouletteSub").textContent=p<.7?"抽選中……":"もうすぐ決まるよ！";if(p<1){setTimeout(()=>requestAnimationFrame(tick),45+Math.pow(p,2)*170)}else{clearTimeout(spinTimer);currentDuration=[5,10,15][Math.floor(Math.random()*3)];$("duration").textContent=currentDuration+"分";$("studyDuration").textContent=currentDuration+"分";show("reveal");confetti();btn.disabled=false}}requestAnimationFrame(tick)}
+$("spinBtn").addEventListener("click",startSpin);
+$("startStudy").addEventListener("click",()=>show("study"));
+$("completeBtn").addEventListener("click",()=>{data.clears++;data.coins+=20;data.eggProgress++;let rewardText="20コイン獲得！",desc="コツコツがんばったね！",icon="🪙";if(data.eggProgress>=3&&data.birds.length<birdTypes.length){data.eggProgress=0;const missing=birdTypes.map((b,i)=>i).filter(i=>!data.birds.includes(i));const got=missing[Math.floor(Math.random()*missing.length)];data.birds.push(got);rewardText=birdTypes[got][1]+"を発見！";desc="3回クリアのごほうび！新しい鳥が図鑑に仲間入り！";icon=birdTypes[got][0]}else{desc="コイン20枚＋たまごのかけらをゲット！";}save();$("rewardIcon").textContent=icon;$("rewardTitle").textContent=rewardText;$("rewardDesc").textContent=desc;show("reward");confetti()});
+$("againBtn").addEventListener("click",()=>{show("home");$("rouletteIcon").textContent="🎁";$("rouletteName").textContent="ミステリー抽選";$("rouletteSub").textContent="ボタンを押して運命のルーレットを回そう！"});
+renderStats();
+</script>
+</body></html>
