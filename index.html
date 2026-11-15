@@ -25,6 +25,10 @@ button{font:inherit;cursor:pointer;border:0}.app{max-width:720px;margin:auto;pad
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}.confetti i{position:absolute;top:-20px;width:9px;height:15px;border-radius:3px;animation:fall 1.8s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.2}}
 footer{text-align:center;color:#a9c0d8;font-size:11px;margin-top:28px}
 @media(min-width:600px){.app{padding-top:26px}.actions{grid-template-columns:1fr 1fr}.actions .primary{grid-column:1/-1}}
+
+.store{margin-top:14px}.store-intro{color:#d9e8f6;font-size:13px;line-height:1.6}.shop-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.shop-item{background:#ffffff12;border:1px solid #ffffff30;border-radius:16px;padding:12px;text-align:center}.shop-item .time{font-size:25px;font-weight:950;color:var(--gold)}.shop-item .cost{font-size:13px;color:#dce9f6;margin:5px 0 9px}.shop-item button{background:linear-gradient(180deg,#ffe59a,#ffbf43);color:#49320a;border-radius:11px;padding:9px 8px;font-weight:900;width:100%}.shop-item button:disabled{opacity:.4;filter:grayscale(1)}.tickets{display:grid;gap:8px;margin-top:12px}.ticket{background:linear-gradient(135deg,#fff8df,#ffe19a);color:#513813;border:2px dashed #bd842b;border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}.ticket strong{font-size:18px}.ticket small{display:block;color:#765b2b}.ticket .ticket-code{font-size:11px;font-weight:900;letter-spacing:.08em}
+.cutin{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:#061329e8;opacity:0;pointer-events:none;transition:opacity .18s}.cutin.show{opacity:1}.cutin-card{width:min(92vw,560px);padding:25px 16px;text-align:center;border:4px solid #fff;border-radius:22px;box-shadow:0 0 35px #fff8;transform:scale(.72) rotate(-3deg);transition:transform .22s}.cutin.show .cutin-card{transform:scale(1) rotate(0)}.cutin.normal .cutin-card{background:linear-gradient(130deg,#294d78,#14243d);border-color:#d6eaff}.cutin.chance .cutin-card{background:linear-gradient(130deg,#b32636,#5b1022);border-color:#ffb1b1;box-shadow:0 0 45px #ff384e}.cutin.hot .cutin-card{background:linear-gradient(130deg,#fff2a6,#e69b21,#fff8dc);color:#542900;border-color:#fff;box-shadow:0 0 60px #ffd166}.cutin-label{font-size:13px;font-weight:950;letter-spacing:.25em}.cutin-title{font-size:clamp(30px,9vw,54px);font-weight:1000;line-height:1.15;margin:12px 0;text-shadow:0 3px 0 #0005}.cutin-sub{font-size:15px;font-weight:800}
+
 </style>
 </head>
 <body>
@@ -44,26 +48,41 @@ footer{text-align:center;color:#a9c0d8;font-size:11px;margin-top:28px}
 <section id="reward" class="hidden panel" style="margin-top:14px;text-align:center"><div class="big" style="font-size:60px">🎊</div><div class="eyebrow">MISSION COMPLETE</div><h2 style="font-size:30px">ミッションクリア！</h2><p class="notice">算数ドリル、おつかれさま！今回の報酬をゲット！</p><div class="result" style="margin:14px 0"><div class="big" id="rewardIcon">🪙</div><h2 id="rewardTitle">20コイン獲得！</h2><p id="rewardDesc">コツコツがんばったね！</p></div><button class="primary" id="againBtn">🏠 ホームに戻る</button></section>
 <section class="grid" aria-label="記録"><div class="stat"><small>クリアした回数</small><strong id="clearCount">0回</strong></div><div class="stat"><small>集めた鳥</small><strong id="birdCount">0羽</strong></div></section>
 <section class="panel" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">🐤 鳥図鑑</h3><span class="sub" id="collectionCount">0 / 8</span></div><div class="birds" id="birdGrid"></div><p class="hint">ドリルをクリアして、鳥たちを集めよう！</p></section>
+
+<section class="panel store" id="store">
+ <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">🎟️ コイン交換所</h3><span class="coins">🪙 <span id="storeCoins">0</span></span></div>
+ <p class="store-intro">がんばって貯めたコインを、Switchで遊べる時間に交換しよう！交換した引換券は保護者に見せてね。</p>
+ <div class="shop-items" id="shopItems"></div>
+ <h4 style="margin:18px 0 8px">🎫 ぼくの引換券</h4>
+ <div class="tickets" id="tickets"><p class="hint">まだ引換券はないよ。コインを貯めて交換しよう！</p></div>
+</section>
+
 <footer>ミステリー抽選 • がんばりを楽しみに変えよう！</footer>
 </main>
-<div class="toast" id="toast"></div><div class="confetti" id="confetti"></div>
+<div class="toast" id="toast"></div><div class="confetti" id="confetti"></div><div class="cutin" id="cutin"><div class="cutin-card"><div class="cutin-label" id="cutinLabel">CHANCE!</div><div style="font-size:58px" id="cutinIcon">⚡</div><div class="cutin-title" id="cutinTitle">これは…!? </div><div class="cutin-sub" id="cutinSub">運命が動き出す！</div></div></div>
 <script>
 const prizes=[["🎮","Switchタイム"],["🐦","鳥探し"],["🍬","お菓子チャンス"],["📚","漢字チャレンジ"],["🎁","宝箱"],["⭐","大当たり"],["🍀","ラッキー賞"],["🗺️","冒険タイム"],["👑","スペシャル賞"],["🌈","自由時間"],["💎","レアチャンス"],["❓","ミステリー賞"]];
 const birdTypes=[["🐦","スズメ"],["🐤","シジュウカラ"],["🦜","インコ"],["🦉","フクロウ"],["🐧","ペンギン"],["🦆","カモ"],["🦚","クジャク"],["🦅","ワシ"]];
-const defaults={coins:0,clears:0,birds:[],eggProgress:0};
-let data={...defaults,...JSON.parse(localStorage.getItem("mysteryDrawData")||"{}")};
+const defaults={coins:0,clears:0,birds:[],eggProgress:0,tickets:[]};
+let data={...defaults,...JSON.parse(localStorage.getItem("mysteryDrawData")||"{}")};data.tickets=data.tickets||[];
 let currentDuration=10,spinTimer=null;
 const $=id=>document.getElementById(id);
-function save(){localStorage.setItem("mysteryDrawData",JSON.stringify(data));renderStats()}
+function save(){localStorage.setItem("mysteryDrawData",JSON.stringify(data));renderStats();renderShop()}
 function renderStats(){$("coinCount").textContent=data.coins;$("clearCount").textContent=data.clears+"回";$("birdCount").textContent=data.birds.length+"羽";$("collectionCount").textContent=data.birds.length+" / "+birdTypes.length;$("birdGrid").innerHTML=birdTypes.map((b,i)=>'<div class="bird"><div class="emoji">'+(data.birds.includes(i)?b[0]:"❔")+'</div><small>'+(data.birds.includes(i)?b[1]:"？？？")+'</small></div>').join("")}
 function show(id){["home","reveal","study","reward"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
 function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2200)}
 function confetti(){const c=$("confetti");c.innerHTML="";for(let i=0;i<55;i++){const e=document.createElement("i");e.style.left=Math.random()*100+"%";e.style.background=["#ffd166","#ff8fab","#8ce0c1","#9bd0ff","#fff"][i%5];e.style.animationDelay=Math.random()*.6+"s";c.appendChild(e)}setTimeout(()=>c.innerHTML="",2600)}
-function startSpin(){const btn=$("spinBtn");btn.disabled=true;let elapsed=0,duration=3300;const start=performance.now();function tick(now){elapsed=now-start;const p=Math.min(elapsed/duration,1);const idx=Math.floor(Math.random()*prizes.length);$("rouletteIcon").textContent=prizes[idx][0];$("rouletteName").textContent=prizes[idx][1];$("rouletteSub").textContent=p<.7?"抽選中……":"もうすぐ決まるよ！";if(p<1){setTimeout(()=>requestAnimationFrame(tick),45+Math.pow(p,2)*170)}else{clearTimeout(spinTimer);currentDuration=[5,10,15][Math.floor(Math.random()*3)];$("duration").textContent=currentDuration+"分";$("studyDuration").textContent=currentDuration+"分";show("reveal");confetti();btn.disabled=false}}requestAnimationFrame(tick)}
+function showCutin(){const types=[{c:"normal",label:"MYSTERY",icon:"👀",title:"何か起こるかも…？",sub:"まだまだこれから！"},{c:"chance",label:"CHANCE UP!",icon:"⚡",title:"これは怪しい…！",sub:"期待していいのか!? "},{c:"hot",label:"SUPER HOT!",icon:"🌈",title:"もしかして大チャンス!? ",sub:"最後まで目を離すな！"}];const weights=[0,1,1,1,2,2,2,2,2,2];const t=types[weights[Math.floor(Math.random()*weights.length)]];$("cutin").className="cutin "+t.c+" show";$("cutinLabel").textContent=t.label;$("cutinIcon").textContent=t.icon;$("cutinTitle").textContent=t.title;$("cutinSub").textContent=t.sub;setTimeout(()=>$("cutin").classList.remove("show"),1250)}
+function startSpin(){const btn=$("spinBtn");btn.disabled=true;let elapsed=0;const duration=5600;const start=performance.now();let lastIndex=-1;setTimeout(showCutin,1650);function tick(now){elapsed=now-start;const p=Math.min(elapsed/duration,1);const idx=Math.floor(Math.random()*prizes.length);if(idx!==lastIndex){$("rouletteIcon").textContent=prizes[idx][0];$("rouletteName").textContent=prizes[idx][1];lastIndex=idx}$("rouletteSub").textContent=p<.55?"抽選中……":p<.88?"ゆっくり…ゆっくり…":"運命の瞬間！";if(p<1){const eased=p*p;setTimeout(()=>requestAnimationFrame(tick),38+Math.pow(eased,2)*260)}else{currentDuration=[5,10,15][Math.floor(Math.random()*3)];$("duration").textContent=currentDuration+"分";$("studyDuration").textContent=currentDuration+"分";show("reveal");confetti();btn.disabled=false}}requestAnimationFrame(tick)}
+
+const shopOptions=[{minutes:10,cost:100},{minutes:20,cost:200},{minutes:30,cost:300},{minutes:60,cost:500}];
+function renderShop(){$("storeCoins").textContent=data.coins;$("shopItems").innerHTML=shopOptions.map(o=>'<div class="shop-item"><div class="time">'+o.minutes+'分</div><div class="cost">🪙 '+o.cost+'コイン</div><button '+(data.coins<o.cost?'disabled':'')+' data-cost="'+o.cost+'" data-minutes="'+o.minutes+'">交換する</button></div>').join("");$("shopItems").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>buyTicket(Number(b.dataset.minutes),Number(b.dataset.cost))));$("tickets").innerHTML=data.tickets.length?data.tickets.slice().reverse().map(t=>'<div class="ticket"><div><strong>🎮 Switch '+t.minutes+'分券</strong><small>保護者に見せてね • '+t.date+'</small></div><div class="ticket-code">'+t.code+'</div></div>').join(""):'<p class="hint">まだ引換券はないよ。コインを貯めて交換しよう！</p>'}
+function buyTicket(minutes,cost){if(data.coins<cost)return;data.coins-=cost;const code="SW-"+Math.random().toString(36).slice(2,7).toUpperCase();data.tickets.push({minutes,cost,code,date:new Date().toLocaleDateString("ja-JP")});save();toast("Switch "+minutes+"分券をゲット！保護者に見せてね 🎟️");confetti()}
+
 $("spinBtn").addEventListener("click",startSpin);
 $("startStudy").addEventListener("click",()=>show("study"));
 $("completeBtn").addEventListener("click",()=>{data.clears++;data.coins+=20;data.eggProgress++;let rewardText="20コイン獲得！",desc="コツコツがんばったね！",icon="🪙";if(data.eggProgress>=3&&data.birds.length<birdTypes.length){data.eggProgress=0;const missing=birdTypes.map((b,i)=>i).filter(i=>!data.birds.includes(i));const got=missing[Math.floor(Math.random()*missing.length)];data.birds.push(got);rewardText=birdTypes[got][1]+"を発見！";desc="3回クリアのごほうび！新しい鳥が図鑑に仲間入り！";icon=birdTypes[got][0]}else{desc="コイン20枚＋たまごのかけらをゲット！";}save();$("rewardIcon").textContent=icon;$("rewardTitle").textContent=rewardText;$("rewardDesc").textContent=desc;show("reward");confetti()});
 $("againBtn").addEventListener("click",()=>{show("home");$("rouletteIcon").textContent="🎁";$("rouletteName").textContent="ミステリー抽選";$("rouletteSub").textContent="ボタンを押して運命のルーレットを回そう！"});
-renderStats();
+renderStats();renderShop();
 </script>
 </body></html>
